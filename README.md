@@ -10,7 +10,5 @@ The Console Calculator is a simple Java console application that allows users to
 - Provides error handling for invalid input and divide-by-zero scenarios.
 - Utilizes object-oriented programming principles for code organization and reusability.
 
-## Getting Started
-
 ## Contributing
 Contributions to the Console Calculator project are welcome. If you find any issues or have suggestions for improvements, please open a GitHub issue and/or create a pull request.
