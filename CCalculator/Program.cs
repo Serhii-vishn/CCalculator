@@ -1,67 +1,61 @@
-﻿using System;
-
-namespace CCalculator
+﻿namespace CCalculator
 {
     internal class Program
     {
-        public static void Main()
+        private static void Main()
         {
-            Console.WriteLine("\t\tWelcome to the simplest console calculator app");
-            Console.WriteLine("\t--------------------------------------------------------------");
-
-            double frstOperand = GetOperand("Entear value: ");
-            double scndOperand = GetOperand("Entear value: ");
-
-            double result = 0.0;
-
-            char operation = GetOperation("Operation: ");
-            switch (operation)
+            try
             {
-                case '+':
-                    result = Calculator.Plus(frstOperand, scndOperand);
-                    break;
-                case '-':
-                    result = Calculator.Minus(frstOperand, scndOperand);
-                    break;
-                case '*':
-                    result = Calculator.Multiply(frstOperand, scndOperand);
-                    break;
-                case '/':
-                    result = Calculator.Divide(frstOperand, scndOperand);
-                    break;
-                default:
-                    Console.WriteLine("Invalid operation. Try again");
-                    break;
-            }
-            Console.WriteLine($"\n\nResult: {result}");
+                Console.WriteLine("\t\tSimple calculator");
+                Console.WriteLine("\t---------------------------------");
 
-            Console.ReadKey();
+                Console.Write("Read from file press 1, input from the console - any: ");
+
+                if(Console.ReadKey().KeyChar == '1')
+                {
+                    string filePath = GetFilePathFromUser();
+                    CCalculator.CalcExpressionFromFile_SaveResult(filePath);                   
+                }
+                else
+                {
+                    Console.Write("\nEnter your expression: ");
+                    string mathExpression = Console.ReadLine();
+
+                    double result = CCalculator.CalcExpression_GetResult(mathExpression);
+                    Console.WriteLine($"Result: {result}");
+                }
+            }
+            catch (FileNotFoundException ex)
+            {
+                Console.WriteLine("File not found: " + ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine("Error: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Unexpected error: " + ex.Message);
+            }
+
+            Console.ReadLine();
         }
 
-        public static double GetOperand(string message)
+        private static string GetFilePathFromUser()
         {
-            while (true)
+            string filePath;
+            do
             {
-                Console.Write(message);
-                if (Double.TryParse(Console.ReadLine(), out double operand))
-                    return operand;
+                Console.Write("\nEnter file path: ");
+                filePath = Console.ReadLine();
 
-                Console.WriteLine("Invalid value. Please enter a number");
-            }
-        }
+                if (!File.Exists(filePath))
+                {
+                    Console.WriteLine("Error: The entered file path is invalid or doesn't exist.");
+                }
+            } while (!File.Exists(filePath));
 
-        public static char GetOperation(string message)
-        {
-            while (true)
-            {
-                Console.Write(message);
-
-                char operation = Console.ReadKey().KeyChar;
-                if(operation.Equals('+') || operation.Equals("-")|| operation.Equals('*') || operation.Equals("/"))
-                    return operation;
-
-                Console.WriteLine("Invalid value. Please enter a number");
-            }
+            return filePath;
         }
     }
 }
