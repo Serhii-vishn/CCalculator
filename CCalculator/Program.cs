@@ -11,17 +11,17 @@
 
                 Console.Write("Read from file press 1, input from the console - any: ");
 
-                if(Console.ReadKey().KeyChar == '1')
+                if (Console.ReadKey().KeyChar == '1')
                 {
                     string filePath = GetFilePathFromUser();
-                    CCalculator.CalcExpressionFromFile_SaveResult(filePath);                   
+                    Calculator.CalcExpressionFromFile_SaveResult(filePath);
                 }
                 else
                 {
                     Console.Write("\nEnter your expression: ");
                     string mathExpression = Console.ReadLine();
 
-                    double result = CCalculator.CalcExpression_GetResult(mathExpression);
+                    double result = Calculator.CalcExpression_GetResult(mathExpression);
                     Console.WriteLine($"Result: {result}");
                 }
             }
