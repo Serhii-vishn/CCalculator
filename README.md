@@ -1,6 +1,13 @@
 # Console Calculator
 
-The Console Calculator is a simple Java console application that allows users to perform basic mathematical calculations through a command-line interface.
+1. CCalculator in the console application with simple operations. Operations are performed with mathematical priority (* / + -)
+2. The application can read data from a file line by line. The calculation is implemented using brackets. Each line is calculated and the result is written to a separate file. 
+
+    ```
+    Input -> Output
+    “2+2*3” -> “8”
+    “2/0” -> Exception. Divide by zero.
+    ```
 
 ## Features
 
