@@ -1,6 +1,6 @@
 using CCalculator;
 
-namespace ÑCalculator.tests
+namespace Ð¡Calculator.tests
 {
     public class CalculatorTests
     {

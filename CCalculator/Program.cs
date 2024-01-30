@@ -1,4 +1,4 @@
-﻿namespace CCalculator
+namespace CCalculator
 {
     internal class Program
     {
