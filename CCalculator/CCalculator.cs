@@ -1,6 +1,6 @@
-﻿namespace CCalculator
+namespace CCalculator
 {
-    public static class CCalculator
+    public static class Calculator
     {
         public static double CalcExpression_GetResult(string mathExpression)
         {
@@ -9,16 +9,17 @@
 
             mathExpression = mathExpression.Replace(" ", "");
 
-            if(IsOperator(mathExpression[^1]) || mathExpression[0] == '*' || mathExpression[0] == '/') 
+            if (IsOperator(mathExpression[^1]) || mathExpression[0] == '/' || mathExpression[0] == '*')
                 throw new ArgumentException("Incomplete mathematical expression");
 
             Stack<double> numbers = new();
             Stack<char> operators = new();
-            bool isLeftBracketExist = false;
+            int openBracketExist = 0;
 
             for (int i = 0; i < mathExpression.Length; i++)
             {
                 char ch = mathExpression[i];
+
                 if (char.IsDigit(ch) || ch == '.')
                 {
                     if (double.TryParse(ReadNumber(mathExpression, ref i), out double number))
@@ -26,32 +27,35 @@
                 }
                 else if (IsOperator(ch))
                 {
-                    while ((operators.Count > 0) && (GetPrecedence(ch) <= GetPrecedence(operators.Peek())))
-                    {
-                        ApplyOperator(numbers, operators.Pop());
-                    }
-                    operators.Push(ch);
+                    if (i >= 1 && IsOperator(mathExpression[i - 1]))
+                        throw new ArgumentException("Incomplete mathematical expression");
+
+                    HandleOperatorWithContext(i, mathExpression, numbers, operators);
                 }
                 else if (ch == '(')
                 {
                     operators.Push(ch);
-                    isLeftBracketExist = true;
+                    openBracketExist++;
                 }
                 else if (ch == ')')
                 {
-                    if(!isLeftBracketExist)
-                             throw new ArgumentException($"Bracket is unpaired");
-
                     while (operators.Count > 0 && operators.Peek() != '(')
-                    {
                         ApplyOperator(numbers, operators.Pop());
-                    }
+
+                    if (operators.Count == 0)
+                        throw new ArgumentException($"Bracket is unpaired");
+
                     operators.Pop();
-                    isLeftBracketExist = false;
-                }              
+                    openBracketExist--;
+                }
                 else
+                {
                     throw new ArgumentException($"Incorrect symbol {ch}");
+                }
             }
+
+            if (openBracketExist != 0)
+                throw new ArgumentException("Unpaired bracket");
 
             return ProcessRemainingOperators(numbers, operators);
         }
@@ -105,6 +109,23 @@
             return ch == '+' || ch == '-' || ch == '*' || ch == '/';
         }
 
+        private static void HandleOperatorWithContext(int i, string mathExpression, Stack<double> numbers, Stack<char> operators)
+        {
+            if (i == 0 || mathExpression[i - 1] == '(')
+            {
+                double signMultip = (mathExpression[i] == '-') ? -1 : 1;
+                numbers.Push(signMultip);
+                operators.Push('*');
+            }
+            else
+            {
+                while (operators.Count > 0 && GetPrecedence(mathExpression[i]) <= GetPrecedence(operators.Peek()))
+                    ApplyOperator(numbers, operators.Pop());
+
+                operators.Push(mathExpression[i]);
+            }
+        }
+
         private static void ApplyOperator(Stack<double> numbers, char op)
         {
             double b = numbers.Pop();
@@ -129,7 +150,7 @@
                     }
                 case '/':
                     {
-                        if(b == 0)
+                        if (b == 0)
                             throw new ArgumentException("Can't divide by zero");
 
                         numbers.Push(a / b);
