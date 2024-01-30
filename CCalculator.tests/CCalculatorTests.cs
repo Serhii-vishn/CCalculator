@@ -1,8 +1,8 @@
 using CCalculator;
 
-namespace CCalculator.tests
+namespace ÑCalculator.tests
 {
-    public class CCalculatorTests
+    public class CalculatorTests
     {
         private const string TestDataDirectory = "TestData";
         private const string ValidFilePath = TestDataDirectory + "\\valid.txt";
@@ -20,17 +20,17 @@ namespace CCalculator.tests
             Directory.CreateDirectory(TestDataDirectory);
 
             File.WriteAllText(ValidFilePath, "1+2\n3*4\n5+20/(5+5)");
-            ValidResults = new string [] 
-            { 
-                "3", 
-                "12", 
-                "7", 
-                "8.5", 
+            ValidResults = new string[]
+            {
+                "3",
+                "12",
+                "7",
+                "8.5",
             };
 
             File.WriteAllText(InvalidFilePath, "1+2+\n4+20/(5-5)\n4+20/(5_5)\n2+11)/11");
-            InvalidResults = new string[] 
-            { 
+            InvalidResults = new string[]
+            {
                 "Incomplete mathematical expression",
                 "Can't divide by zero",
                 "Incorrect symbol _",
@@ -47,13 +47,13 @@ namespace CCalculator.tests
         [Test]
         public void TryAttemptWithEmptyFile_ThrowsArgumentException()
         {
-            Assert.Throws<ArgumentException>(() => CCalculator.CalcExpressionFromFile_SaveResult(string.Empty));
+            Assert.Throws<ArgumentException>(() => Calculator.CalcExpressionFromFile_SaveResult(string.Empty));
         }
 
         [Test]
         public void InputFileWhithValidData_ReturnNewFileWhithCorrectData()
         {
-            CCalculator.CalcExpressionFromFile_SaveResult(ValidFilePath);
+            Calculator.CalcExpressionFromFile_SaveResult(ValidFilePath);
 
             var allExpressions = File.ReadAllLines(ValidFilePathResults);
             for (int i = 0; i < allExpressions.Length; i++)
@@ -65,7 +65,7 @@ namespace CCalculator.tests
         [Test]
         public void InputFileWhithInalidData_ReturnNewFileWhithCorrectData()
         {
-            CCalculator.CalcExpressionFromFile_SaveResult(InvalidFilePath);
+            Calculator.CalcExpressionFromFile_SaveResult(InvalidFilePath);
 
             var allExpressions = File.ReadAllLines(InvalidFilePathResults);
             for (int i = 0; i < allExpressions.Length; i++)
@@ -75,23 +75,44 @@ namespace CCalculator.tests
         }
 
         [TestCase("2+2* 3/3+1", 5)]
-        [TestCase("1+2*(3+2)", 11)]
+        [TestCase("-1+2*(3+2)", 9)]
         [TestCase("2+15/3+4*2", 15)]
-        public void InputExpression_ReturncorrectResult(string expression, double result)
+        public void InputSimpleExpression_ReturnCorrectResult(string expression, double result)
         {
-            Assert.That(CCalculator.CalcExpression_GetResult(expression), Is.EqualTo(result));
+            Assert.That(Calculator.CalcExpression_GetResult(expression), Is.EqualTo(result));
+        }
+
+        [TestCase("(-5+11)/(-2-3)", -1.2)]
+        [TestCase("2*(9/3+1)+4", 12)]
+        [TestCase("2*(9/3-0.5)+4*(-9/2+1.5)", -7)]
+        [TestCase("(2.95-0.45)*(-11-0.5)/4*(2+1.5)", -25.15625)]
+        public void InputExpressionWithBrackets_ReturnCorrectResult(string expression, double result)
+        {
+            Assert.That(Calculator.CalcExpression_GetResult(expression), Is.EqualTo(result));
         }
 
         [Test]
         public void TryDivideZero_ThrowsArgumentException()
         {
-            Assert.Throws<ArgumentException>(() => CCalculator.CalcExpression_GetResult("15/(20-20)"));
+            Assert.Throws<ArgumentException>(() => Calculator.CalcExpression_GetResult("15/(20-20)"));
         }
 
         [Test]
         public void TrySendEmptyExpression_ThrowsArgumentException()
         {
-            Assert.Throws<ArgumentException>(() => CCalculator.CalcExpression_GetResult(""));
+            Assert.Throws<ArgumentException>(() => Calculator.CalcExpression_GetResult(""));
+        }
+
+        [Test]
+        public void TrySendInvalidExpression_ThrowsArgumentException()
+        {
+            Assert.Throws<ArgumentException>(() => Calculator.CalcExpression_GetResult("*5+10"));
+        }
+
+        [Test]
+        public void TrySendExpressionWithUnpairedBracket_ThrowsArgumentException()
+        {
+            Assert.Throws<ArgumentException>(() => Calculator.CalcExpression_GetResult("((5+10)-11"));
         }
     }
 }
